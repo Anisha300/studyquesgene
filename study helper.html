@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyOS</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase (compat) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <style>
+    body { margin:0; font-family:Inter; background:linear-gradient(135deg,#eef2ff,#f8fafc);} 
+    .center {display:flex;justify-content:center;align-items:center;height:100vh;}
+    .login-box {background:white;padding:30px;border-radius:16px;width:300px;box-shadow:0 10px 30px rgba(0,0,0,0.1);} 
+    input {width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:1px solid #ddd;}
+    button {width:100%;padding:10px;border:none;border-radius:8px;background:#6366f1;color:white;font-weight:bold;cursor:pointer;margin-bottom:5px;}
+    .app {display:none;grid-template-columns:240px 1fr;height:100vh;}
+    .sidebar {background:#111827;color:white;padding:20px;}
+    .main {padding:20px;}
+    .card {background:white;padding:15px;border-radius:12px;margin-bottom:15px;}
+    .error {color:red;font-size:12px;margin-top:5px;}
+  </style>
+</head>
+<body>
+
+<div class="center" id="loginPage">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="signUp()">Sign Up</button>
+    <button onclick="login()">Login</button>
+    <div id="error" class="error"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="sidebar">
+    <h2>StudyOS</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h3>Welcome</h3>
+      <p id="userEmail"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// IMPORTANT: Run on real server (NOT file://)
+// Use VS Code Live Server or localhost
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyACxLdBd3puUGmGCXWSf1RRa8lRqOGQt3E",
+    authDomain: "study-helper-62774.firebaseapp.com",
+    projectId: "study-helper-62774",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  function showError(msg) {
+    document.getElementById('error').textContent = msg;
+  }
+
+  window.signUp = function () {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) return showError("Enter email & password");
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => showError("Account created. Now login."))
+      .catch(err => showError(err.message));
+  }
+
+  window.login = function () {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) return showError("Enter email & password");
+
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(err => showError(err.message));
+  }
+
+  window.logout = function () {
+    auth.signOut();
+  }
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').style.display = 'grid';
+      document.getElementById('userEmail').textContent = user.email;
+    } else {
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+  });
+
+});
+
+</script>
+
+</body>
+</html>
